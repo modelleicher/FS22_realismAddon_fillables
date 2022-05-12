@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<modDesc descVersion="64">
+    <author>modelleicher (Farming Agency)</author>
+    <version>0.3.0.0</version>
+    <title>
+        <de>RealismAddon: Fillables</de>
+		<en>RealismAddon: Fillables</en>
+    </title>
+    <description>
+        <de>
+<![CDATA[Dieses Script erhöht den Realismus für Füllbare Fahrzeuge. Es besteht hauptsächlich aus 2 Dingen.
+Zum einen erlaubt es Fahrzeuge über das zulässige Gesamtgewicht zu beladen. 
+Das andere Feature ist die Möglichkeit Fillables über 100% zu füllen allerdings mit zunehmendem "Verlust".]]>
+        </de>
+	<en>
+<![CDATA[This Script is made to enhance realism on fillable vehicles. It consists of mainly two things.
+First it allows fillable vehicles to be overloaded past max. allowed weight.
+Secondly it allows fillables to be filled past 100% with increasing "loss" penalty.]]>
+	</en>
+    </description>
+
+	<iconFilename>store.dds</iconFilename>
+
+    <multiplayer supported="true"/>
+	
+    <extraSourceFiles>
+	
+        <sourceFile filename="realismAddon_fillables.lua"/>
+		
+    </extraSourceFiles>
+	
+</modDesc>
