@@ -5,6 +5,7 @@
     <title>
         <de>RealismAddon: Fillables</de>
 		<en>RealismAddon: Fillables</en>
+		<cz>RealismAddon: Fillables</cz>
     </title>
     <description>
         <de>
@@ -17,6 +18,11 @@ Das andere Feature ist die Möglichkeit Fillables über 100% zu füllen allerdin
 First it allows fillable vehicles to be overloaded past max. allowed weight.
 Secondly it allows fillables to be filled past 100% with increasing "loss" penalty.]]>
 	</en>
+	<cz>
+<![CDATA[Tento skript je vytvořen pro zvýšení realismu na plnitelných vozidlech. Skládá se především ze dvou věcí.
+Nejprve umožňuje přetížení plnitelných vozidel nad max. povolenou hmotnost.
+Za druhé, umožňuje naplnit vozidla na více než 100 % se zvyšující se penalizací za ztrátu.]]>
+	</cz>	
     </description>
 
 	<iconFilename>store.dds</iconFilename>
