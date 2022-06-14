@@ -16,7 +16,8 @@
 
 # Changelog:
 
-
+###### V 0.3.0.1
+- Fixed MixerWagons not working correctly in Multiplayer
 ###### V 0.3.0.0
 - Initial Github Release for FS22, 12th of Mai 2022 
 
