@@ -20,7 +20,7 @@ realismAddon_fillables.capacityMultiplier = 1.3
 -- list of specs that need to be included in order to change the capacity limit 
 realismAddon_fillables.includeSpecList = {"spec_trailer", "spec_combine"}
 -- list of specs that if included disable the capacity limit 
-realismAddon_fillables.excludeSpecList = {}
+realismAddon_fillables.excludeSpecList = {"spec_mixerWagon"}
 -- list of fillTypes that are excluded from the capacity limit change 
 realismAddon_fillables.excludeFillTypesList = {"diesel", "water", "liquidManure", "liquidFertilizer", "milk", "def", "herbicide", "digestate", "SUNFLOWER_OIL", "CANOLA_OIL", "OLIVE_OIL", "CHOCOLATE", "BOARDS", "FURNITURE", "EGG", "TOMATO", "LETTUCE", "ELECTRICCHARGE", "METHANE", "WOOL", "TREESAPLINGS" }
 
@@ -67,6 +67,7 @@ function realismAddon_fillables:addFillUnitFillLevel(superFunc, farmId, fillUnit
 	local includes, excludes = realismAddon_fillables.checkIncludeExcludeSpecs(self)
 	
 	if includes and excludes then
+	
 
 		local spec = self.spec_fillUnit
 		local fillUnit = spec.fillUnits[fillUnitIndex]
@@ -163,6 +164,7 @@ function realismAddon_fillables:getFillUnitFreeCapacity(superFunc, fillUnitIndex
 		
 	if includes and excludes then
 	
+	
 		local spec = self.spec_fillUnit
 		local fillUnit = spec.fillUnits[fillUnitIndex]	
 	
@@ -193,6 +195,7 @@ function realismAddon_fillables.onReadUpdateStream(self, superFunc, streamId, ti
 
 	local includes, excludes = realismAddon_fillables.checkIncludeExcludeSpecs(self)
 	if includes and excludes then
+	
 	
 		local spec = self.spec_fillUnit
 		
@@ -230,6 +233,7 @@ FillUnit.onReadUpdateStream = Utils.overwrittenFunction(FillUnit.onReadUpdateStr
 function realismAddon_fillables.onWriteUpdateStream(self, superFunc, streamId, connection, dirtyMask)
 	local includes, excludes = realismAddon_fillables.checkIncludeExcludeSpecs(self)
 	if includes and excludes then
+	
 	
 		local spec = self.spec_fillUnit
 		
