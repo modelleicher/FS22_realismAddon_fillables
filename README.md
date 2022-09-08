@@ -10,12 +10,17 @@
  2. The second feature of this script is to not have a rigid capacity limit. You can fill trailers past 100%, BUT the further above 100% you fill the more of the fill gets "spilled" e.g. lost. 
  		This is simply because IRL you don't have any rigid limits either. If you have 150l left in your combine you don't need another trailer for that, or if you're full just a few meters away from the field ending you don't need to unload first.
 		The loss is 0% at 100% capacity and 100% at 130% capacity but the actual loss amount is also a bit random up to 20% more than the mathematical loss, so as soon as 100% capacity are reached you can lose up to 20% of each further filling
+		You can toggle this feature on/off on each vehicle by the additonal input-binding (needs to be mapped first, is not mapped by default)
+		It is automatically on by default but for playing with Courseplay or AutoDrive it needs to be toggled off otherwise the helper will fill trailers up to 130% accumulating a lot of loss.
 
 # Credits
 - Modelleicher
 
 # Changelog:
 
+###### V 0.3.0.2
+- Fixed last Multiplayer Issues, should now no longer be any issues in Multiplayer 
+- added Input to disable filling above 100% on each vehicle individually (to deactivate it when playing with AutoDrive/Courseplay so they don't keep filling to 130%)
 ###### V 0.3.0.1
 - Fixed MixerWagons not working correctly in Multiplayer
 ###### V 0.3.0.0
