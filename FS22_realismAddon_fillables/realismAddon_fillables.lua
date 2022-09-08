@@ -22,11 +22,146 @@ realismAddon_fillables.includeSpecList = {"spec_trailer", "spec_combine"}
 -- list of specs that if included disable the capacity limit 
 realismAddon_fillables.excludeSpecList = {"spec_mixerWagon"}
 -- list of fillTypes that are excluded from the capacity limit change 
-realismAddon_fillables.excludeFillTypesList = {"diesel", "water", "liquidManure", "liquidFertilizer", "milk", "def", "herbicide", "digestate", "SUNFLOWER_OIL", "CANOLA_OIL", "OLIVE_OIL", "CHOCOLATE", "BOARDS", "FURNITURE", "EGG", "TOMATO", "LETTUCE", "ELECTRICCHARGE", "METHANE", "WOOL", "TREESAPLINGS" }
+realismAddon_fillables.excludeFillTypesList = {"cotton", "diesel", "water", "liquidManure", "liquidFertilizer", "milk", "def", "herbicide", "digestate", "SUNFLOWER_OIL", "CANOLA_OIL", "OLIVE_OIL", "CHOCOLATE", "BOARDS", "FURNITURE", "EGG", "TOMATO", "LETTUCE", "ELECTRICCHARGE", "METHANE", "WOOL", "TREESAPLINGS" }
 
 
 
--- FillUnit:setFillUnitCapacity(fillUnitIndex, capacity, noEventSend)
+-- Input  stuff for turning the feature off on particular vehicles for compatability with Courseplay/AutoDrive and so on 
+------------------------------------------------------------------------------------------------------------------------
+-- onRegister actionEvent for FillUnit 
+function realismAddon_fillables.onRegisterActionEvents(self, isActiveForInput, isActiveForInputIgnoreSelection)
+	if self.isClient then
+		local spec = self.spec_fillUnit
+
+        if isActiveForInputIgnoreSelection then
+            local _, actionEventId = self:addActionEvent(spec.actionEvents, InputAction.REALISM_ADDON_FILLABLES_LOCALONOFF , self, FillUnit.RAFtoggleOnOffLocally, false, true, false, true, nil)
+            g_inputBinding:setActionEventTextPriority(actionEventId, GS_PRIO_HIGH)
+            
+			if spec.realismAddon_fillables_active then
+				g_inputBinding:setActionEventText(actionEventId, g_i18n:getText("action_REALISM_ADDON_FILLABLES_LOCALON"))
+			else
+				g_inputBinding:setActionEventText(actionEventId, g_i18n:getText("action_REALISM_ADDON_FILLABLES_LOCALOFF"))
+			end
+        end
+    end
+end
+FillUnit.onRegisterActionEvents = Utils.appendedFunction(FillUnit.onRegisterActionEvents, realismAddon_fillables.onRegisterActionEvents)
+
+-- add toggleOnOffLocally function 
+function realismAddon_fillables.registerFunctions(vehicleType)
+	SpecializationUtil.registerFunction(vehicleType, "RAFtoggleOnOffLocally", FillUnit.RAFtoggleOnOffLocally)
+end
+FillUnit.registerFunctions = Utils.appendedFunction(FillUnit.registerFunctions, realismAddon_fillables.registerFunctions)
+
+-- register realismAddon_fillables_active variable in onLoad
+function realismAddon_fillables.onLoad(self, superFunc, savegame)
+    local returnValue = superFunc(self, savegame)
+   
+    local spec = self.spec_fillUnit
+	spec.realismAddon_fillables_active = true
+
+    return returnValue
+end
+FillUnit.onLoad = Utils.overwrittenFunction(FillUnit.onLoad, realismAddon_fillables.onLoad)
+
+-- toggle func is also the inputEvent func at the same time 
+function FillUnit.RAFtoggleOnOffLocally(self, actionName, inputValue, callbackState, isAnalog, value, value2, value3, state, noEventSend)
+	local spec = self.spec_fillUnit
+	
+	
+	
+	if state ~= nil then
+		spec.realismAddon_fillables_active = state	
+	else
+		spec.realismAddon_fillables_active = not spec.realismAddon_fillables_active
+	end
+	
+     -- call event
+    realismAddon_fillables_toggleOnOffEvent.sendEvent(self, state, noEventSend)
+	
+	if spec.actionEvents ~= nil and spec.actionEvents[InputAction.REALISM_ADDON_FILLABLES_LOCALONOFF] ~= nil then
+		if spec.realismAddon_fillables_active then
+		    g_inputBinding:setActionEventText(spec.actionEvents[InputAction.REALISM_ADDON_FILLABLES_LOCALONOFF].actionEventId, g_i18n:getText("action_REALISM_ADDON_FILLABLES_LOCALON"))
+		else
+		    g_inputBinding:setActionEventText(spec.actionEvents[InputAction.REALISM_ADDON_FILLABLES_LOCALONOFF].actionEventId, g_i18n:getText("action_REALISM_ADDON_FILLABLES_LOCALOFF"))
+		end
+	end	
+end
+
+-- onReadStream and onWriteStream
+function realismAddon_fillables.onReadStream(self, streamId, connection)
+	local spec = self.spec_fillUnit
+    if spec.realismAddon_fillables_active ~= nil then
+        local realismAddon_fillables_active = streamReadBool(streamId)
+        if realismAddon_fillables_active ~= nil then
+            self:RAFtoggleOnOffLocally(nil, nil, nil, nil, nil, nil, nil, realismAddon_fillables_active, true)
+        end
+    end
+end
+FillUnit.onReadStream = Utils.appendedFunction(FillUnit.onReadStream, realismAddon_fillables.onReadStream)
+
+function realismAddon_fillables.onWriteStream(self, streamId, connection)
+	local spec = self.spec_fillUnit
+    if spec.realismAddon_fillables_active ~= nil then
+	    streamWriteBool(streamId, spec.realismAddon_fillables_active)
+    end
+end
+FillUnit.onWriteStream = Utils.appendedFunction(FillUnit.onWriteStream, realismAddon_fillables.onWriteStream)
+
+
+-- Event for toggle on off locally per vehicle 
+realismAddon_fillables_toggleOnOffEvent = {}
+local realismAddon_fillables_toggleOnOffEvent_mt = Class(realismAddon_fillables_toggleOnOffEvent, Event)
+
+InitEventClass(realismAddon_fillables_toggleOnOffEvent, "realismAddon_fillables_toggleOnOffEvent")
+
+function realismAddon_fillables_toggleOnOffEvent.emptyNew()
+	local self = Event.new(realismAddon_fillables_toggleOnOffEvent_mt)
+    self.className = "realismAddon_fillables_toggleOnOffEvent";
+	return self
+end
+
+function realismAddon_fillables_toggleOnOffEvent.new(vehicle, state)
+	local self = realismAddon_fillables_toggleOnOffEvent.emptyNew()
+	self.vehicle = vehicle
+	self.state = state
+
+	return self
+end
+
+function realismAddon_fillables_toggleOnOffEvent:readStream(streamId, connection)
+	self.vehicle = NetworkUtil.readNodeObject(streamId)
+	self.state = streamReadBool(streamId)
+
+	self:run(connection)
+end
+
+function realismAddon_fillables_toggleOnOffEvent:writeStream(streamId, connection)
+	NetworkUtil.writeNodeObject(streamId, self.vehicle)
+	streamWriteBool(streamId, self.state)
+end
+
+function realismAddon_fillables_toggleOnOffEvent:run(connection)
+	if self.vehicle ~= nil and self.vehicle:getIsSynchronized() then
+        self.vehicle:RAFtoggleOnOffLocally(nil, nil, nil, nil, nil, nil, nil, self.state, true)
+	end
+
+	if not connection:getIsServer() then
+		g_server:broadcastEvent(realismAddon_fillables_toggleOnOffEvent.new(self.vehicle, self.state), nil, connection, self.vehicle)
+	end
+end
+
+function realismAddon_fillables_toggleOnOffEvent.sendEvent(vehicle, state, noEventSend)
+	if (noEventSend == nil or noEventSend == false) then
+		if g_server ~= nil then
+			g_server:broadcastEvent(realismAddon_fillables_toggleOnOffEvent.new(vehicle, state), nil, nil, vehicle)
+		else
+			g_client:getServerConnection():sendEvent(realismAddon_fillables_toggleOnOffEvent.new(vehicle, state))
+		end
+	end
+end
+-- Input Stuff End 
+-------------------
 
 function realismAddon_fillables.checkIncludeExcludeSpecs(self)
 	local includes = false
@@ -61,15 +196,14 @@ function realismAddon_fillables.checkExcludeFillType(fillUnit)
 	return true
 end
 
-
 function realismAddon_fillables:addFillUnitFillLevel(superFunc, farmId, fillUnitIndex, fillLevelDelta, fillTypeIndex, toolType, fillPositionData)
 	
 	local includes, excludes = realismAddon_fillables.checkIncludeExcludeSpecs(self)
 	
-	if includes and excludes then
+	local spec = self.spec_fillUnit	
 	
-
-		local spec = self.spec_fillUnit
+	if includes and excludes and spec.realismAddon_fillables_active then
+	
 		local fillUnit = spec.fillUnits[fillUnitIndex]
 		
 		if realismAddon_fillables.checkExcludeFillType(fillUnit) then
@@ -128,9 +262,10 @@ function realismAddon_fillables:getFillUnitAllowsFillType(superFunc, fillUnitInd
 
 	local includes, excludes = realismAddon_fillables.checkIncludeExcludeSpecs(self)
 		
-	if includes and excludes then
+	local spec = self.spec_fillUnit	
 	
-		local spec = self.spec_fillUnit
+	if includes and excludes and spec.realismAddon_fillables_active then
+
 		local fillUnit = spec.fillUnits[fillUnitIndex]		
 	
 		if realismAddon_fillables.checkExcludeFillType(fillUnit) then
@@ -162,10 +297,10 @@ function realismAddon_fillables:getFillUnitFreeCapacity(superFunc, fillUnitIndex
 	
 	local includes, excludes = realismAddon_fillables.checkIncludeExcludeSpecs(self)
 		
-	if includes and excludes then
+	local spec = self.spec_fillUnit	
 	
+	if includes and excludes and spec.realismAddon_fillables_active then
 	
-		local spec = self.spec_fillUnit
 		local fillUnit = spec.fillUnits[fillUnitIndex]	
 	
 		if realismAddon_fillables.checkExcludeFillType(fillUnit) then
@@ -194,11 +329,11 @@ FillUnit.getFillUnitFreeCapacity = Utils.overwrittenFunction(FillUnit.getFillUni
 function realismAddon_fillables.onReadUpdateStream(self, superFunc, streamId, timestamp, connection)
 
 	local includes, excludes = realismAddon_fillables.checkIncludeExcludeSpecs(self)
-	if includes and excludes then
 	
+	local spec = self.spec_fillUnit	
 	
-		local spec = self.spec_fillUnit
-		
+	if includes and excludes and spec.realismAddon_fillables_active then
+	
 		-- go through all fillUnits and set capacities if neccesary 
 		for i = 1, table.getn(spec.fillUnits) do
 			local fillUnit = spec.fillUnits[i]		
@@ -206,22 +341,28 @@ function realismAddon_fillables.onReadUpdateStream(self, superFunc, streamId, ti
 				-- backup original capacity	
 				fillUnit.capacityOriginal = fillUnit.capacity
 				-- capacity is temporarily raised by realismAddon_fillables.capacityMultiplier 
-				fillUnit.capacity = fillUnit.capacity * realismAddon_fillables.capacityMultiplier	
+				fillUnit.capacity = fillUnit.capacity * realismAddon_fillables.capacityMultiplier					
 			end
 		end
 		
+
 		-- call original function while capacity is temporarily raised 	
 		local returnValue = superFunc(self, streamId, timestamp, connection)
 		
+
 		-- go through all fillUnits and reset capacities if neccesary 
 		for i = 1, table.getn(spec.fillUnits) do
 			local fillUnit = spec.fillUnits[i]		
 			if realismAddon_fillables.checkExcludeFillType(fillUnit) then
 				-- reset capacity back 
-				fillUnit.capacity = fillUnit.capacityOriginal
+				-- check if capacityOriginal backup exists first because if fillUnit fillType changed during call of the original function it might not have been affected by the capacity change this call 
+				if fillUnit.capacityOriginal ~= nil then
+					fillUnit.capacity = fillUnit.capacityOriginal
+				end
 			end
-		end		
-			
+		end	
+
+
 		return returnValue		
 	else
 		return superFunc(self, streamId, timestamp, connection)
@@ -232,19 +373,19 @@ FillUnit.onReadUpdateStream = Utils.overwrittenFunction(FillUnit.onReadUpdateStr
 
 function realismAddon_fillables.onWriteUpdateStream(self, superFunc, streamId, connection, dirtyMask)
 	local includes, excludes = realismAddon_fillables.checkIncludeExcludeSpecs(self)
-	if includes and excludes then
 	
+	local spec = self.spec_fillUnit	
 	
-		local spec = self.spec_fillUnit
-		
+	if includes and excludes and spec.realismAddon_fillables_active then
+			
 		-- go through all fillUnits and set capacities if neccesary 
 		for i = 1, table.getn(spec.fillUnits) do
 			local fillUnit = spec.fillUnits[i]		
 			if realismAddon_fillables.checkExcludeFillType(fillUnit) then
 				-- backup original capacity	
 				fillUnit.capacityOriginal = fillUnit.capacity
-				-- capacity is temporarily raised by realismAddon_fillables.capacityMultiplier 
-				fillUnit.capacity = fillUnit.capacity * realismAddon_fillables.capacityMultiplier	
+				-- capacity is temporarily raised by realismAddon_fillables.capacityMultiplier
+				fillUnit.capacity = fillUnit.capacity * realismAddon_fillables.capacityMultiplier			
 			end
 		end
 		
@@ -256,7 +397,7 @@ function realismAddon_fillables.onWriteUpdateStream(self, superFunc, streamId, c
 			local fillUnit = spec.fillUnits[i]		
 			if realismAddon_fillables.checkExcludeFillType(fillUnit) then
 				-- reset capacity back 
-				fillUnit.capacity = fillUnit.capacityOriginal
+				fillUnit.capacity = fillUnit.capacityOriginal					
 			end
 		end		
 		

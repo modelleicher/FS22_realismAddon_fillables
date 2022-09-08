@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="64">
+<modDesc descVersion="68">
     <author>modelleicher (Farming Agency)</author>
-    <version>0.3.0.1</version>
+    <version>0.3.0.2</version>
     <title>
         <de>RealismAddon: Fillables</de>
 		<en>RealismAddon: Fillables</en>
@@ -34,5 +34,21 @@ Za druhé, umožňuje naplnit vozidla na více než 100 % se zvyšující se pen
         <sourceFile filename="realismAddon_fillables.lua"/>
 		
     </extraSourceFiles>
+	
+    <actions>
+        <action name="REALISM_ADDON_FILLABLES_LOCALONOFF" />
+    </actions>
+
+    <inputBinding>
+        <actionBinding action="REALISM_ADDON_FILLABLES_LOCALONOFF">
+            <binding device="KB_MOUSE_DEFAULT" input=""/>
+        </actionBinding>
+    </inputBinding>
+
+	<l10n>
+        <text name="action_REALISM_ADDON_FILLABLES_LOCALONOFF"><de>Kapazität-Überladen: an/aus schalten</de><en>Capacity-Overload: toggle on/off</en></text>
+        <text name="action_REALISM_ADDON_FILLABLES_LOCALON"><de>Kapazität-Überladen: an</de><en>Capacity-Overload: on</en></text>
+        <text name="action_REALISM_ADDON_FILLABLES_LOCALOFF"><de>Kapazität-Überladen: aus</de><en>Capactiy-Overload: off</en></text>
+ 	</l10n>   	
 	
 </modDesc>
