@@ -18,6 +18,8 @@
 
 # Changelog:
 
+###### V 0.3.0.3
+- added spec_baler to exclude List to stop Biobaler from overloading
 ###### V 0.3.0.2
 - Fixed last Multiplayer Issues, should now no longer be any issues in Multiplayer 
 - added Input to disable filling above 100% on each vehicle individually (to deactivate it when playing with AutoDrive/Courseplay so they don't keep filling to 130%)
