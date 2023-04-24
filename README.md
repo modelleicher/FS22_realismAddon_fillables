@@ -18,6 +18,10 @@
 
 # Changelog:
 
+
+###### V 0.3.0.5
+- fixed wheels-mass being added twice 
+
 ###### V 0.3.0.4
 - fixed wrong capacity with excluded fillTypes in Multiplayer (water etc.)
 - deactivated automatic turn-off in forageWagons at 100% (careful, you have to turn off the wagon yourself otherwise it will load to 129% with a lot of loss)

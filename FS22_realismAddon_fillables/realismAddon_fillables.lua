@@ -505,10 +505,12 @@ function realismAddon_fillables.updateVehicleMass(self, superFunc)
 		component.mass = component.defaultMass + additionalMass		
 		
 		-- get component mass with wheels, the component.mass from above is already used
-		component.mass = self:getComponentMass(component)
+		--component.mass = self:getComponentMass(component)
 		
 		-- add to serverMass
-		self.serverMass = self.serverMass + component.mass
+		--self.serverMass = self.serverMass + component.mass
+		self.serverMass = self.serverMass + self:getComponentMass(component)
+		-- change mass calculation to not double the wheels fix 
 		
 		-- calculate overload percentage
 		self.overloadPercentage = 0
