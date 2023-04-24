@@ -18,6 +18,11 @@
 
 # Changelog:
 
+###### V 0.3.0.4
+- fixed wrong capacity with excluded fillTypes in Multiplayer (water etc.)
+- deactivated automatic turn-off in forageWagons at 100% (careful, you have to turn off the wagon yourself otherwise it will load to 129% with a lot of loss)
+- fixed loss-calculation to have less loss at few % over 100, maximum loss at 130% is not 100% anymore either - random component on each level 
+
 ###### V 0.3.0.3
 - added spec_baler to exclude List to stop Biobaler from overloading
 ###### V 0.3.0.2

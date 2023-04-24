@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8" standalone="no" ?>
-<modDesc descVersion="69">
+<modDesc descVersion="73">
     <author>modelleicher (Farming Agency)</author>
-    <version>0.3.0.3</version>
+    <version>0.3.0.4</version>
     <title>
         <de>RealismAddon: Fillables</de>
 		<en>RealismAddon: Fillables</en>
-		<cz>RealismAddon: Fillables</cz>
     </title>
     <description>
         <de>
