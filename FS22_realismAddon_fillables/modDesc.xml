@@ -28,10 +28,8 @@ Za druhé, umožňuje naplnit vozidla na více než 100 % se zvyšující se pen
 
     <multiplayer supported="true"/>
 	
-    <extraSourceFiles>
-	
-        <sourceFile filename="realismAddon_fillables.lua"/>
-		
+    <extraSourceFiles>	
+        <sourceFile filename="realismAddon_fillables.lua"/>		
     </extraSourceFiles>
 	
     <actions>
@@ -45,9 +43,8 @@ Za druhé, umožňuje naplnit vozidla na více než 100 % se zvyšující se pen
     </inputBinding>
 
 	<l10n>
-        <text name="action_REALISM_ADDON_FILLABLES_LOCALONOFF"><de>Kapazität-Überladen: an/aus schalten</de><en>Capacity-Overload: toggle on/off</en></text>
-        <text name="action_REALISM_ADDON_FILLABLES_LOCALON"><de>Kapazität-Überladen: an</de><en>Capacity-Overload: on</en></text>
-        <text name="action_REALISM_ADDON_FILLABLES_LOCALOFF"><de>Kapazität-Überladen: aus</de><en>Capactiy-Overload: off</en></text>
- 	</l10n>   	
-	
+        <text name="input_REALISM_ADDON_FILLABLES_LOCALONOFF"><de>Kapazität-Überladen: an/aus schalten</de><en>Capacity-Overload: toggle on/off</en><pl>Włącz/Wyłącz przeładowanie pojemności</pl></text>
+        <text name="action_REALISM_ADDON_FILLABLES_LOCALON"><de>Kapazität-Überladen: an</de><en>Capacity-Overload: on</en><pl>Przeładowanie pojemności włączone</pl></text>
+        <text name="action_REALISM_ADDON_FILLABLES_LOCALOFF"><de>Kapazität-Überladen: aus</de><en>Capactiy-Overload: off</en><pl>Przeładowanie pojemności wyłączone</pl></text>
+ 	</l10n>
 </modDesc>
