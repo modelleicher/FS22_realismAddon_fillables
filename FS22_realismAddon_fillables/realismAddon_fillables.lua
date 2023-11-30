@@ -234,7 +234,7 @@ function realismAddon_fillables:addFillUnitFillLevel(superFunc, farmId, fillUnit
 	
 		local fillUnit = spec.fillUnits[fillUnitIndex]
 		
-		if realismAddon_fillables.checkExcludeFillType(fillUnit) then
+		if fillUnit ~= nil and realismAddon_fillables.checkExcludeFillType(fillUnit) then
 		
 			-- backup original capacity
 			local capacityOriginal = fillUnit.capacity
