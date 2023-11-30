@@ -18,11 +18,11 @@ realismAddon_fillables = {};
 realismAddon_fillables.capacityMultiplier = 1.3
 
 -- list of specs that need to be included in order to change the capacity limit 
-realismAddon_fillables.includeSpecList = {"spec_trailer", "spec_combine"}
+realismAddon_fillables.includeSpecList = {"spec_combine", "spec_trailer"}
 -- list of specs that if included disable the capacity limit 
-realismAddon_fillables.excludeSpecList = {"spec_mixerWagon", "spec_baler"}
+realismAddon_fillables.excludeSpecList = {"spec_mixerWagon", "spec_baler" }
 -- list of fillTypes that are excluded from the capacity limit change 
-realismAddon_fillables.excludeFillTypesList = {"cotton", "diesel", "water", "liquidManure", "liquidFertilizer", "milk", "def", "herbicide", "digestate", "SUNFLOWER_OIL", "CANOLA_OIL", "OLIVE_OIL", "CHOCOLATE", "BOARDS", "FURNITURE", "EGG", "TOMATO", "LETTUCE", "ELECTRICCHARGE", "METHANE", "WOOL", "TREESAPLINGS" }
+realismAddon_fillables.excludeFillTypesList = {"unknown", "cotton", "diesel", "water", "liquidManure", "liquidFertilizer", "milk", "def", "herbicide", "digestate", "SUNFLOWER_OIL", "CANOLA_OIL", "OLIVE_OIL", "CHOCOLATE", "BOARDS", "FURNITURE", "EGG", "TOMATO", "LETTUCE", "ELECTRICCHARGE", "METHANE", "WOOL", "TREESAPLINGS" }
 
 
 
@@ -196,6 +196,34 @@ function realismAddon_fillables.checkExcludeFillType(fillUnit)
 	return true
 end
 
+function realismAddon_fillables.fillForageWagon(self, superFunc)
+	
+	local includes, excludes = realismAddon_fillables.checkIncludeExcludeSpecs(self)
+	if includes and excludes and self.spec_fillUnit.realismAddon_fillables_active then	
+		local spec = self.spec_forageWagon	
+
+		local loadInfo = self:getFillVolumeLoadInfo(spec.loadInfoIndex)
+		local filledLiters = self:addFillUnitFillLevel(self:getOwnerFarmId(), spec.fillUnitIndex, spec.workAreaParameters.litersToFill, spec.lastFillType, ToolType.UNDEFINED, loadInfo)
+
+		local fillUnit = self.spec_fillUnit.fillUnits[spec.fillUnitIndex]
+		if fillUnit.fillLevel >= fillUnit.capacity * (realismAddon_fillables.capacityMultiplier - 0.01) then
+			self:setIsTurnedOn(false)
+			self:setPickupState(false)		
+		end
+
+		spec.workAreaParameters.litersToFill = spec.workAreaParameters.litersToFill - filledLiters
+
+		if spec.workAreaParameters.litersToFill < 0.01 then
+			spec.workAreaParameters.litersToFill = 0
+		end
+		return true
+	else
+		return superFunc()
+	end
+end
+ForageWagon.fillForageWagon = Utils.overwrittenFunction(ForageWagon.fillForageWagon, realismAddon_fillables.fillForageWagon)
+
+
 function realismAddon_fillables:addFillUnitFillLevel(superFunc, farmId, fillUnitIndex, fillLevelDelta, fillTypeIndex, toolType, fillPositionData)
 	
 	local includes, excludes = realismAddon_fillables.checkIncludeExcludeSpecs(self)
@@ -232,11 +260,11 @@ function realismAddon_fillables:addFillUnitFillLevel(superFunc, farmId, fillUnit
 					-- random value between 0 and 1
 					local randomValue = math.random()
 					
-					-- add the randomValue to lossPercent, max. random is 20% more than lossPercent and max lossPercent is 1 (100%)
-					lossPercent = math.min(1, lossPercent + (randomValue * 0.2))
+					-- changed to lossPercent * randomValue 
+					lossPercent = math.min(1, lossPercent * randomValue)
 					
-					-- finally remove loss from delta 
-					fillLevelDelta = fillLevelDelta * lossPercent
+					-- finally remove loss from delta (changed) 
+					fillLevelDelta = fillLevelDelta - (fillLevelDelta * lossPercent)
 				end
 			end
 			
@@ -332,6 +360,7 @@ function realismAddon_fillables.onReadUpdateStream(self, superFunc, streamId, ti
 	
 	local spec = self.spec_fillUnit	
 	
+
 	if includes and excludes and spec.realismAddon_fillables_active then
 	
 		-- go through all fillUnits and set capacities if neccesary 
@@ -352,7 +381,7 @@ function realismAddon_fillables.onReadUpdateStream(self, superFunc, streamId, ti
 
 		-- go through all fillUnits and reset capacities if neccesary 
 		for i = 1, table.getn(spec.fillUnits) do
-			local fillUnit = spec.fillUnits[i]		
+			local fillUnit = spec.fillUnits[i]			
 			if realismAddon_fillables.checkExcludeFillType(fillUnit) then
 				-- reset capacity back 
 				-- check if capacityOriginal backup exists first because if fillUnit fillType changed during call of the original function it might not have been affected by the capacity change this call 
@@ -376,12 +405,13 @@ function realismAddon_fillables.onWriteUpdateStream(self, superFunc, streamId, c
 	
 	local spec = self.spec_fillUnit	
 	
+	
 	if includes and excludes and spec.realismAddon_fillables_active then
 			
 		-- go through all fillUnits and set capacities if neccesary 
 		for i = 1, table.getn(spec.fillUnits) do
-			local fillUnit = spec.fillUnits[i]		
-			if realismAddon_fillables.checkExcludeFillType(fillUnit) then
+			local fillUnit = spec.fillUnits[i]				
+			if realismAddon_fillables.checkExcludeFillType(fillUnit) then		
 				-- backup original capacity	
 				fillUnit.capacityOriginal = fillUnit.capacity
 				-- capacity is temporarily raised by realismAddon_fillables.capacityMultiplier
@@ -394,8 +424,8 @@ function realismAddon_fillables.onWriteUpdateStream(self, superFunc, streamId, c
 		
 		-- go through all fillUnits and reset capacities if neccesary 
 		for i = 1, table.getn(spec.fillUnits) do
-			local fillUnit = spec.fillUnits[i]		
-			if realismAddon_fillables.checkExcludeFillType(fillUnit) then
+			local fillUnit = spec.fillUnits[i]					
+			if realismAddon_fillables.checkExcludeFillType(fillUnit) then			
 				-- reset capacity back 
 				fillUnit.capacity = fillUnit.capacityOriginal					
 			end
@@ -475,10 +505,12 @@ function realismAddon_fillables.updateVehicleMass(self, superFunc)
 		component.mass = component.defaultMass + additionalMass		
 		
 		-- get component mass with wheels, the component.mass from above is already used
-		component.mass = self:getComponentMass(component)
+		--component.mass = self:getComponentMass(component)
 		
 		-- add to serverMass
-		self.serverMass = self.serverMass + component.mass
+		--self.serverMass = self.serverMass + component.mass
+		self.serverMass = self.serverMass + self:getComponentMass(component)
+		-- change mass calculation to not double the wheels fix 
 		
 		-- calculate overload percentage
 		self.overloadPercentage = 0
