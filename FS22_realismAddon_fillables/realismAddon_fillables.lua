@@ -22,7 +22,7 @@ realismAddon_fillables.includeSpecList = {"spec_combine", "spec_trailer"}
 -- list of specs that if included disable the capacity limit 
 realismAddon_fillables.excludeSpecList = {"spec_mixerWagon", "spec_baler" }
 -- list of fillTypes that are excluded from the capacity limit change 
-realismAddon_fillables.excludeFillTypesList = {"unknown", "cotton", "diesel", "water", "liquidManure", "liquidFertilizer", "milk", "def", "herbicide", "digestate", "SUNFLOWER_OIL", "CANOLA_OIL", "OLIVE_OIL", "CHOCOLATE", "BOARDS", "FURNITURE", "EGG", "TOMATO", "LETTUCE", "ELECTRICCHARGE", "METHANE", "WOOL", "TREESAPLINGS" }
+realismAddon_fillables.excludeFillTypesList = {"unknown", "cotton", "diesel", "water", "liquidManure", "liquidFertilizer", "milk", "def", "herbicide", "digestate", "SUNFLOWER_OIL", "CANOLA_OIL", "OLIVE_OIL", "CHOCOLATE", "BOARDS", "FURNITURE", "EGG", "TOMATO", "LETTUCE", "ELECTRICCHARGE", "METHANE", "WOOL", "TREESAPLINGS", "SILAGE_ADDITIVE" }
 
 
 
